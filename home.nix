@@ -14,6 +14,14 @@
 
   programs.home-manager.enable = true;
 
+  nix = {
+    settings = {
+      experimental-features = [ "nix-command" "flakes" ];
+      substituters = [ "https://mirrors.ustc.edu.cn/nix-channels/store" "https://cache.nixos.org/" ];
+    };
+    package = pkgs.nix;
+  };
+
   programs.git = {
     enable = true;
     userName = "Nick Ballard";
@@ -22,7 +30,7 @@
 
   systemd.user.services.clash = {
     Unit.Description = "Clash Daemon";
-    Service.ExecStart = "${pkgs.clash}/bin/clash -f ${./private/clash-tag.yaml} -d ${config.home.homeDirectory}/.local/var/clash";
+    Service.ExecStart = "${pkgs.clash}/bin/clash -f ${./private/clash-naked.yaml} -d ${config.home.homeDirectory}/.local/var/clash";
     Install.WantedBy = [ "default.target" ];
   };
 
