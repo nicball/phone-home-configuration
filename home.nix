@@ -1,4 +1,4 @@
-{ config, pkgs, npkgs, ... }@args:
+{ config, pkgs, npkgs, transfersh, ... }@args:
 
 {
   home = {
@@ -80,6 +80,28 @@
       Environment = [
         "TG_BOT_TOKEN=${builtins.readFile ./private/fvckbot-token}"
         "https_proxy=http://localhost:7890"
+      ];
+    };
+    Install.WantedBy = [ "default.target" ];
+  };
+
+  systemd.user.services.transfersh = {
+    Unit.Description = "Easy and fast file sharing from the command-line";
+    Service = {
+      ExecStart =
+        let pkg = with pkgs; buildGoModule {
+          src = transfersh;
+          pname = "transfer.sh";
+          version = "1.4.0";
+          vendorSha256 = "sha256-d7EMXCtDGp9k6acVg/FiLqoO1AsRzoCMkBb0zen9IGc=";
+        }; in
+        "${pkg}/bin/transfer.sh";
+      Environment = [
+        "LISTENER=:8081"
+        "TEMP_PATH=/tmp/"
+        "PROVIDER=local"
+        "BASEDIR=${config.home.homeDirectory + "/transfersh"}"
+        "LOG=${config.home.homeDirectory + "/transfersh/.log"}"
       ];
     };
     Install.WantedBy = [ "default.target" ];

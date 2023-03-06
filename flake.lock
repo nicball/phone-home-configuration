@@ -30,6 +30,21 @@
         "type": "github"
       }
     },
+    "flake-utils_3": {
+      "locked": {
+        "lastModified": 1631561581,
+        "narHash": "sha256-3VQMV5zvxaVLvqqUrNz3iJelLw30mIVSfZmAaauM3dA=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "7e5bf3925f6fbdfaf50a2a7ca0be2879c4261d19",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
     "fvckbot": {
       "inputs": {
         "flake-utils": "flake-utils",
@@ -132,7 +147,30 @@
         "fvckbot": "fvckbot",
         "home-manager": "home-manager",
         "nicpkgs": "nicpkgs",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "transfersh": "transfersh"
+      }
+    },
+    "transfersh": {
+      "inputs": {
+        "flake-utils": "flake-utils_3",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1652626093,
+        "narHash": "sha256-8XMeLIhVWqXBeQToVSyLxEBgLVhCZ+kAf96Cti5e04U=",
+        "owner": "dutchcoders",
+        "repo": "transfer.sh",
+        "rev": "35e794220b3c998194d7d52796e052ef00795c2f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "dutchcoders",
+        "ref": "v1.4.0",
+        "repo": "transfer.sh",
+        "type": "github"
       }
     },
     "utils": {

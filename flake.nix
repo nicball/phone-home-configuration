@@ -15,6 +15,10 @@
       url = "github:nicball/fvckbot";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    transfersh = {
+      url = "github:dutchcoders/transfer.sh/v1.4.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { nixpkgs, home-manager, nicpkgs, ... }@inputs:
@@ -26,7 +30,7 @@
         inherit pkgs;
         modules = [ ./home.nix ];
         extraSpecialArgs = {
-          inherit (inputs) fvckbot;
+          inherit (inputs) fvckbot transfersh;
           inherit system;
           npkgs = nicpkgs.packages.${system};
           nlib = nicpkgs.lib.${system};
