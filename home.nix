@@ -7,7 +7,7 @@
     stateVersion = "21.11";
 
     packages = with pkgs; [
-      nix htop curl wget npkgs.kakoune neofetch unar screen aria2
+      nix htop curl wget npkgs.kakoune neofetch unar screen aria2 file
       kitty.terminfo
     ];
   };
@@ -43,7 +43,7 @@
     Unit.Description = "Minecraft Server";
     Service = {
       WorkingDirectory = "${config.home.homeDirectory + "/mc"}";
-      ExecStart="${pkgs.papermc}/bin/minecraft-server -Dhttp.proxyHost=127.0.0.1 -Dhttp.proxyPort=7890 -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=7890 -Xmx4G";
+      ExecStart="/bin/sh -c '${pkgs.jre_headless}/bin/java -Dhttp.proxyHost=127.0.0.1 -Dhttp.proxyPort=7890 -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=7890 -Xmx4G -jar ./fabric*.jar nogui' minecraft";
     };
     Install.WantedBy = [ "default.target" ];
   };
