@@ -7,7 +7,7 @@
     stateVersion = "21.11";
 
     packages = with pkgs; [
-      nix htop curl wget npkgs.kakoune neofetch unar screen aria2 file
+      nix htop curl wget npkgs.kakoune neofetch unar tmux aria2 file
       kitty.terminfo
     ];
   };
@@ -30,7 +30,7 @@
 
   systemd.user.services.clash = {
     Unit.Description = "Clash Daemon";
-    Service.ExecStart = "${pkgs.clash}/bin/clash -f ${./private/clash-naked.yaml} -d ${config.home.homeDirectory}/.local/var/clash";
+    Service.ExecStart = "${pkgs.clash}/bin/clash -f ${./private/clash-tag.yaml} -d ${config.home.homeDirectory}/.local/var/clash";
     Install.WantedBy = [ "default.target" ];
   };
 
@@ -42,8 +42,11 @@
   systemd.user.services.minecraft = {
     Unit.Description = "Minecraft Server";
     Service = {
+      Type = "oneshot";
       WorkingDirectory = "${config.home.homeDirectory + "/mc"}";
-      ExecStart="/bin/sh -c '${pkgs.jre_headless}/bin/java -Dhttp.proxyHost=127.0.0.1 -Dhttp.proxyPort=7890 -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=7890 -Xmx4G -jar ./fabric*.jar nogui' minecraft";
+      ExecStart = "${pkgs.tmux}/bin/tmux new -s minecraft -d '${pkgs.jre_headless}/bin/java -Dhttp.proxyHost=127.0.0.1 -Dhttp.proxyPort=7890 -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=7890 -Xmx3576M -jar ./fabric*.jar nogui'";
+      ExecStop = "${pkgs.tmux}/bin/tmux kill-session -t minecraft";
+      RemainAfterExit = true;
     };
     Install.WantedBy = [ "default.target" ];
   };
