@@ -39,12 +39,14 @@
     shellInit = "source ${config.home.profileDirectory}/etc/profile.d/nix.fish";
   };
 
+  programs.nix-index.enable = true;
+
   systemd.user.services.minecraft = {
     Unit.Description = "Minecraft Server";
     Service = {
       Type = "oneshot";
       WorkingDirectory = "${config.home.homeDirectory + "/mc"}";
-      ExecStart = "${pkgs.tmux}/bin/tmux new -s minecraft -d '${pkgs.jre_headless}/bin/java -Dhttp.proxyHost=127.0.0.1 -Dhttp.proxyPort=7890 -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=7890 -Xmx3576M -jar ./fabric*.jar nogui'";
+      ExecStart = "${pkgs.tmux}/bin/tmux new -s minecraft -d '${pkgs.jre_headless}/bin/java -Dhttp.proxyHost=127.0.0.1 -Dhttp.proxyPort=7890 -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=7890 -Xmx3072M -jar ./fabric*.jar nogui'";
       ExecStop = "${pkgs.tmux}/bin/tmux kill-session -t minecraft";
       RemainAfterExit = true;
     };

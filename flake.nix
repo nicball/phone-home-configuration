@@ -19,6 +19,10 @@
       url = "github:dutchcoders/transfer.sh/v1.4.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix-index-database = {
+      url = "github:Mic92/nix-index-database";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { nixpkgs, home-manager, nicpkgs, ... }@inputs:
@@ -28,7 +32,7 @@
     in {
       homeConfigurations.phablet = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
-        modules = [ ./home.nix ];
+        modules = [ ./home.nix inputs.nix-index-database.hmModules.nix-index ];
         extraSpecialArgs = {
           inherit (inputs) fvckbot transfersh;
           inherit system;
