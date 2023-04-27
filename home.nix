@@ -7,8 +7,10 @@
     stateVersion = "21.11";
 
     packages = with pkgs; [
-      nix htop curl wget npkgs.kakoune neofetch unar tmux aria2 file jq
-      pv
+      nix htop curl wget npkgs.kakoune neofetch
+      unar tmux aria2 file jq gnugrep pv
+      gcc
+      man-pages man-pages-posix
       kitty.terminfo
     ];
   };
@@ -78,18 +80,18 @@
       Install.WantedBy = [ "default.target" ];
     };
 
-  systemd.user.services.fvckbot = {
-    Unit.Description = "Yet another telegram bot";
-    Service = {
-      ExecStart = "${args.fvckbot.defaultPackage.${args.system}}/bin/fvckbot";
-      WorkingDirectory = "${config.home.homeDirectory + "/fvckbot"}";
-      Environment = [
-        "TG_BOT_TOKEN=${builtins.readFile ./private/fvckbot-token}"
-        "https_proxy=http://localhost:7890"
-      ];
-    };
-    Install.WantedBy = [ "default.target" ];
-  };
+  # systemd.user.services.fvckbot = {
+  #   Unit.Description = "Yet another telegram bot";
+  #   Service = {
+  #     ExecStart = "${args.fvckbot.defaultPackage.${args.system}}/bin/fvckbot";
+  #     WorkingDirectory = "${config.home.homeDirectory + "/fvckbot"}";
+  #     Environment = [
+  #       "TG_BOT_TOKEN=${builtins.readFile ./private/fvckbot-token}"
+  #       "https_proxy=http://localhost:7890"
+  #     ];
+  #   };
+  #   Install.WantedBy = [ "default.target" ];
+  # };
 
   systemd.user.services.transfersh = {
     Unit.Description = "Easy and fast file sharing from the command-line";
@@ -111,5 +113,14 @@
       ];
     };
     Install.WantedBy = [ "default.target" ];
+  };
+
+  services.instaepub = {
+    enable = true;
+    consumer-key = builtins.readFile ./private/instaepub/consumer-key;
+    consumer-secret = builtins.readFile ./private/instaepub/consumer-secret;
+    username = builtins.readFile ./private/instaepub/username;
+    password = builtins.readFile ./private/instaepub/password;
+    output-dir = config.home.homeDirectory + "/www/instaepub";
   };
 }

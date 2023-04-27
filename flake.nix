@@ -2,7 +2,6 @@
   description = "Home Manager configuration of Nicball";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -23,6 +22,7 @@
       url = "github:Mic92/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    instaepub.url = "github:nicball/instaepub";
   };
 
   outputs = { nixpkgs, home-manager, nicpkgs, ... }@inputs:
@@ -32,7 +32,11 @@
     in {
       homeConfigurations.phablet = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
-        modules = [ ./home.nix inputs.nix-index-database.hmModules.nix-index ];
+        modules = [
+          ./home.nix
+          inputs.nix-index-database.hmModules.nix-index
+          inputs.instaepub.homeModules.${system}.instaepub
+        ];
         extraSpecialArgs = {
           inherit (inputs) fvckbot transfersh;
           inherit system;
