@@ -1,4 +1,4 @@
-{ config, pkgs, npkgs, transfersh, ... }@args:
+{ system, config, pkgs, nicpkgs, transfersh, fvckbot, ... }:
 
 {
   home = {
@@ -7,7 +7,7 @@
     stateVersion = "21.11";
 
     packages = with pkgs; [
-      nix htop curl wget npkgs.kakoune neofetch
+      nix htop curl wget nicpkgs.kakoune neofetch
       unar tmux aria2 file jq gnugrep pv
       gcc
       man-pages man-pages-posix
@@ -83,7 +83,7 @@
   # systemd.user.services.fvckbot = {
   #   Unit.Description = "Yet another telegram bot";
   #   Service = {
-  #     ExecStart = "${args.fvckbot.defaultPackage.${args.system}}/bin/fvckbot";
+  #     ExecStart = "${fvckbot.defaultPackage.${system}}/bin/fvckbot";
   #     WorkingDirectory = "${config.home.homeDirectory + "/fvckbot"}";
   #     Environment = [
   #       "TG_BOT_TOKEN=${builtins.readFile ./private/fvckbot-token}"
@@ -122,5 +122,14 @@
     username = builtins.readFile ./private/instaepub/username;
     password = builtins.readFile ./private/instaepub/password;
     output-dir = config.home.homeDirectory + "/www/instaepub";
+    interval = "hourly";
+  };
+
+  systemd.user.services.aria2d = {
+    Unit.Description = "Aria2 Daemon";
+    Service = {
+      ExecStart = "${nicpkgs.aria2.override { server-mode = true; dir = config.home.homeDirectory + "/www/files"; }}/bin/aria2c";
+    };
+    Install.WantedBy = [ "default.target" ];
   };
 }

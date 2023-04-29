@@ -22,7 +22,6 @@
       url = "github:Mic92/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    instaepub.url = "github:nicball/instaepub";
   };
 
   outputs = { nixpkgs, home-manager, nicpkgs, ... }@inputs:
@@ -35,13 +34,13 @@
         modules = [
           ./home.nix
           inputs.nix-index-database.hmModules.nix-index
-          inputs.instaepub.homeModules.${system}.instaepub
+          nicpkgs.homeModules.${system}.instaepub
         ];
         extraSpecialArgs = {
           inherit (inputs) fvckbot transfersh;
           inherit system;
-          npkgs = nicpkgs.packages.${system};
-          nlib = nicpkgs.lib.${system};
+          nicpkgs = nicpkgs.packages.${system};
+          niclib = nicpkgs.niclib.${system};
         };
       };
     };

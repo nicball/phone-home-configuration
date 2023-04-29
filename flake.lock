@@ -34,24 +34,6 @@
       }
     },
     "flake-utils_3": {
-      "inputs": {
-        "systems": "systems_2"
-      },
-      "locked": {
-        "lastModified": 1681202837,
-        "narHash": "sha256-H+Rh19JDwRtpVPAWp64F+rlEtxUWBAQW28eAi3SRSzg=",
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "rev": "cfacdce06f30d2b68473a46042957675eebb3401",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "type": "github"
-      }
-    },
-    "flake-utils_4": {
       "locked": {
         "lastModified": 1631561581,
         "narHash": "sha256-3VQMV5zvxaVLvqqUrNz3iJelLw30mIVSfZmAaauM3dA=",
@@ -107,40 +89,19 @@
         "type": "github"
       }
     },
-    "instaepub": {
-      "inputs": {
-        "flake-utils": "flake-utils_2",
-        "nixpkgs": "nixpkgs"
-      },
-      "locked": {
-        "lastModified": 1682616419,
-        "narHash": "sha256-S9k84geDOMc+HjHk2jMn1nLBnV6qBIrFO2DzAZVOEjQ=",
-        "owner": "nicball",
-        "repo": "instaepub",
-        "rev": "3ea689dc3da65fdce185528b65a6d6d9e52888c8",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nicball",
-        "repo": "instaepub",
-        "type": "github"
-      }
-    },
     "nicpkgs": {
       "inputs": {
-        "flake-utils": "flake-utils_3",
-        "nixos1909": "nixos1909",
+        "flake-utils": "flake-utils_2",
         "nixpkgs": [
           "nixpkgs"
-        ],
-        "nixpkgs-latest": "nixpkgs-latest"
+        ]
       },
       "locked": {
-        "lastModified": 1682076982,
-        "narHash": "sha256-ZSBwGNUXVVafoUSryM4iGQEudClYXylsAB/P4ZvQYKI=",
+        "lastModified": 1682749310,
+        "narHash": "sha256-v0LyLXmCZkbLA6LQ59AmUqYU8YovKUzE7Kfw5rObNGY=",
         "owner": "nicball",
         "repo": "nicpkgs",
-        "rev": "0258e8cb8e0940b08501b235984e63bfe932965a",
+        "rev": "96fe0df692443a4dd24181897eae001a57c0a030",
         "type": "github"
       },
       "original": {
@@ -169,52 +130,7 @@
         "type": "github"
       }
     },
-    "nixos1909": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1600952148,
-        "narHash": "sha256-GUKHrnng33luc6mUT3rDnZ3Hm+4MMEJpEchRIAQx7JQ=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "75f4ba05c63be3f147bcc2f7bd4ba1f029cedcb1",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixos-19.09",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "nixpkgs": {
-      "locked": {
-        "lastModified": 1682535835,
-        "narHash": "sha256-DrCcsZId29H+mr7yviOfCZeJOnJ51MIWLX3qSwwSpLI=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "d12fa94d29856187b1c80db4edf4588df986d217",
-        "type": "github"
-      },
-      "original": {
-        "id": "nixpkgs",
-        "type": "indirect"
-      }
-    },
-    "nixpkgs-latest": {
-      "locked": {
-        "lastModified": 1681358109,
-        "narHash": "sha256-eKyxW4OohHQx9Urxi7TQlFBTDWII+F+x2hklDOQPB50=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "96ba1c52e54e74c3197f4d43026b3f3d92e83ff9",
-        "type": "github"
-      },
-      "original": {
-        "id": "nixpkgs",
-        "type": "indirect"
-      }
-    },
-    "nixpkgs_2": {
       "locked": {
         "lastModified": 1682566018,
         "narHash": "sha256-HPzPRFiy2o/7k7mtnwfM1E6NVZHiFbPdmYCMoIpkHO4=",
@@ -232,10 +148,9 @@
       "inputs": {
         "fvckbot": "fvckbot",
         "home-manager": "home-manager",
-        "instaepub": "instaepub",
         "nicpkgs": "nicpkgs",
         "nix-index-database": "nix-index-database",
-        "nixpkgs": "nixpkgs_2",
+        "nixpkgs": "nixpkgs",
         "transfersh": "transfersh"
       }
     },
@@ -254,24 +169,9 @@
         "type": "github"
       }
     },
-    "systems_2": {
-      "locked": {
-        "lastModified": 1681028828,
-        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
-        "owner": "nix-systems",
-        "repo": "default",
-        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nix-systems",
-        "repo": "default",
-        "type": "github"
-      }
-    },
     "transfersh": {
       "inputs": {
-        "flake-utils": "flake-utils_4",
+        "flake-utils": "flake-utils_3",
         "nixpkgs": [
           "nixpkgs"
         ]
