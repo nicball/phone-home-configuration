@@ -64,7 +64,7 @@
 
   systemd.user.services.cloudflared = {
     Unit.Description = "Cloudflare Argo Tunnel";
-    Service.ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel --no-autoupdate run --token ${builtins.readFile ./private/cloudflared-token}";
+    Service.ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel --no-autoupdate run --token ${import ./private/cloudflared-token.nix}";
     Install.WantedBy = [ "default.target" ];
   };
 
@@ -86,7 +86,7 @@
   #     ExecStart = "${fvckbot.defaultPackage.${system}}/bin/fvckbot";
   #     WorkingDirectory = "${config.home.homeDirectory + "/fvckbot"}";
   #     Environment = [
-  #       "TG_BOT_TOKEN=${builtins.readFile ./private/fvckbot-token}"
+  #       "TG_BOT_TOKEN=${import ./private/fvckbot-token.nix}"
   #       "https_proxy=http://localhost:7890"
   #     ];
   #   };
@@ -117,18 +117,28 @@
 
   services.instaepub = {
     enable = true;
-    consumer-key = builtins.readFile ./private/instaepub/consumer-key;
-    consumer-secret = builtins.readFile ./private/instaepub/consumer-secret;
-    username = builtins.readFile ./private/instaepub/username;
-    password = builtins.readFile ./private/instaepub/password;
     output-dir = config.home.homeDirectory + "/www/instaepub";
+    auto-archive = true;
     interval = "hourly";
-  };
+  } // import ./private/instaepub.nix;
+
+  services.cloudflare-ddns = {
+    enable = true;
+    log = "/tmp/cloudflare-ddns.log";
+  } // import ./private/cloudflare-ddns.nix;
 
   systemd.user.services.aria2d = {
     Unit.Description = "Aria2 Daemon";
     Service = {
-      ExecStart = "${nicpkgs.aria2.override { server-mode = true; dir = config.home.homeDirectory + "/www/files"; }}/bin/aria2c";
+      ExecStart =
+        let
+          aria2 = nicpkgs.aria2.override {
+            server-mode = true;
+            dir = config.home.homeDirectory + "/www/files";
+            rpc-secret = "${import ./private/aria2d-rpc-secret.nix}";
+          };
+        in
+        "${aria2}/bin/aria2c";
     };
     Install.WantedBy = [ "default.target" ];
   };

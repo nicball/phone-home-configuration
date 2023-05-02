@@ -35,6 +35,7 @@
           ./home.nix
           inputs.nix-index-database.hmModules.nix-index
           nicpkgs.homeModules.${system}.instaepub
+          nicpkgs.homeModules.${system}.cloudflare-ddns
         ];
         extraSpecialArgs = {
           inherit (inputs) fvckbot transfersh;
