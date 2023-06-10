@@ -3,7 +3,7 @@
 
   inputs = {
     home-manager = {
-      url = "github:nix-community/home-manager";
+      url = "github:nix-community/home-manager/release-23.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nicpkgs = {
@@ -22,6 +22,7 @@
       url = "github:Mic92/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
   };
 
   outputs = { nixpkgs, home-manager, nicpkgs, ... }@inputs:

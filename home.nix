@@ -8,7 +8,7 @@
 
     packages = with pkgs; [
       nix htop curl wget nicpkgs.kakoune neofetch
-      unar tmux aria2 file jq gnugrep pv
+      unar tmux aria2 file jq gnugrep pv less
       gcc
       man-pages man-pages-posix
       kitty.terminfo
@@ -21,6 +21,7 @@
     settings = {
       experimental-features = [ "nix-command" "flakes" ];
       substituters = [ "https://mirrors.ustc.edu.cn/nix-channels/store" "https://cache.nixos.org/" ];
+      auto-optimise-store = true;
     };
     package = pkgs.nix;
   };
@@ -142,4 +143,32 @@
     };
     Install.WantedBy = [ "default.target" ];
   };
+
+  systemd.user.services.mautrix-telegram = {
+    Unit = {
+      Description = "Mautrix Telegram Bridge";
+      After = [ "synapse.service" ];
+    };
+    Service = {
+      ExecStart =
+        let
+          py = pkgs.python3.withPackages (p: with p; [ pysocks pkgs.mautrix-telegram ]);
+        in
+        "${py}/bin/python3 -m mautrix_telegram";
+      WorkingDirectory = "${config.home.homeDirectory + "/mautrix-telegram"}";
+    };
+    Install.WantedBy = [ "default.target" ];
+  };
+
+  systemd.user.services.synapse = {
+    Unit = {
+      Description = "Synapse Matrix Home Server";
+    };
+    Service = {
+      ExecStart = "${pkgs.matrix-synapse}/bin/synapse_homeserver -c home_server.yaml";
+      WorkingDirectory = "${config.home.homeDirectory + "/synapse"}";
+    };
+    Install.WantedBy = [ "default.target" ];
+  };
+      
 }
