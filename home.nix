@@ -12,6 +12,7 @@
       gcc
       man-pages man-pages-posix
       kitty.terminfo
+      nicpkgs.owncast
     ];
   };
 
@@ -57,11 +58,11 @@
   #   Install.WantedBy = [ "default.target" ];
   # };
 
-  # systemd.user.services.frpc = {
-  #   Unit.Description = "Fast Reverse Proxy Client";
-  #   Service.ExecStart = "${pkgs.frp}/bin/frpc -c ${./private/frpc.ini}";
-  #   Install.WantedBy = [ "default.target" ];
-  # };
+  systemd.user.services.frpc = {
+    Unit.Description = "Fast Reverse Proxy Client";
+    Service.ExecStart = "${pkgs.frp}/bin/frpc -c ${./private/frpc.ini}";
+    Install.WantedBy = [ "default.target" ];
+  };
 
   systemd.user.services.cloudflared = {
     Unit.Description = "Cloudflare Argo Tunnel";
@@ -133,11 +134,10 @@
     Service = {
       ExecStart =
         let
-          aria2 = nicpkgs.aria2.override {
+          aria2 = nicpkgs.aria2.override ({
             server-mode = true;
             dir = config.home.homeDirectory + "/www/files";
-            rpc-secret = "${import ./private/aria2d-rpc-secret.nix}";
-          };
+          } // import ./private/aria2d.nix);
         in
         "${aria2}/bin/aria2c";
     };
@@ -167,8 +167,57 @@
     Service = {
       ExecStart = "${pkgs.matrix-synapse}/bin/synapse_homeserver -c home_server.yaml";
       WorkingDirectory = "${config.home.homeDirectory + "/synapse"}";
+      Environment = [ "https_proxy=http://localhost:7890" ];
     };
     Install.WantedBy = [ "default.target" ];
   };
+
+  systemd.user.services.factorio =
+    let
+      factorio = pkgs.stdenv.mkDerivation {
+        pname = "factorio-headless";
+        version = "1.1.80";
+        src = pkgs.fetchurl {
+          name = "factorio_headless_x64-1.1.80.tar.xz";
+          url = "https://factorio.com/get-download/1.1.80/headless/linux64";
+          sha256 = "0db6g50gwcq2lwlgagc7in12wag6siwcldlq367x2h0d2q0rxj36";
+        };
+        preferLocalBuild = true;
+        dontBuild = true;
+        installPhase = ''
+          mkdir -p $out/{bin,share/factorio}
+          cp -a data $out/share/factorio
+          cp -a bin/x64/factorio $out/bin/factorio
+          # patchelf \
+          #   --set-interpreter $(cat $NIX_CC/nix-support/dynamic-linker) \
+          #   $out/bin/factorio
+        '';
+      };
+      workingDir = config.home.homeDirectory + "/factorio";
+      configFile = pkgs.writeText "factorio.conf" ''
+        use-system-read-write-data-directories=true
+        [path]
+        read-data=${factorio}/share/factorio/data
+        write-data=${workingDir}
+      '';
+    in {
+      Unit = {
+        Description = "Factorio Server";
+      };
+      Service = {
+        ExecStart = toString [
+          "${pkgs.box64}/bin/box64"
+          "${factorio}/bin/factorio"
+          "--config=${configFile}"
+          "--start-server=${workingDir + "/saves/server.zip"}"
+          "--server-settings=${workingDir + "/server-settings.json"}"
+          "--mod-directory=${workingDir + "/mods"}"
+          "--server-adminlist=${workingDir + "/server-adminlist.json"}"
+        ];
+        WorkingDirectory = workingDir;
+        Environment = [ "https_proxy=http://localhost:7890" ];
+      };
+      Install.WantedBy = [ "default.target" ];
+    };
       
 }
