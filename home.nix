@@ -148,6 +148,8 @@
     Unit = {
       Description = "Mautrix Telegram Bridge";
       After = [ "synapse.service" ];
+      PartOf = [ "synapse.service" ];
+      Requires = [ "synapse.service" ];
     };
     Service = {
       ExecStart =
@@ -213,11 +215,25 @@
           "--server-settings=${workingDir + "/server-settings.json"}"
           "--mod-directory=${workingDir + "/mods"}"
           "--server-adminlist=${workingDir + "/server-adminlist.json"}"
+          (import ./private/factorio-rcon-flags.nix)
         ];
         WorkingDirectory = workingDir;
         Environment = [ "https_proxy=http://localhost:7890" ];
       };
       Install.WantedBy = [ "default.target" ];
     };
+
+  systemd.user.services.factorio-bot = {
+    Unit = {
+      Description = "Factorio Telegram Bridge";
+      After = [ "factorio.service" ];
+      Requires = [ "factorio.service" ];
+      PartOf = [ "factorio.service" ];
+    };
+    Service = {
+      ExecStart = "${pkgs.jre_headless}/bin/java -Dhttp.proxyHost=localhost -Dhttp.proxyPort=7890 -Dhttps.proxyHost=localhost -Dhttps.proxyPort=7890 -jar " + ./private/factorio-bot.jar;
+    };
+    Install.WantedBy = [ "default.target" ];
+  };
       
 }
