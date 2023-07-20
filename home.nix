@@ -1,4 +1,4 @@
-{ system, config, pkgs, nicpkgs, transfersh, fvckbot, ... }:
+{ system, config, pkgs, lib, nicpkgs, transfersh, fvckbot, ... }:
 
 {
   home = {
@@ -123,6 +123,7 @@
     auto-archive = true;
     interval = "hourly";
   } // import ./private/instaepub.nix;
+  systemd.user.services.instaepub.Service.Environment = lib.mkMerge [ "https_proxy=http://localhost:7890" ];
 
   services.cloudflare-ddns = {
     enable = true;
