@@ -6,10 +6,7 @@
       url = "github:nix-community/home-manager/release-23.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nicpkgs = {
-      url = "github:nicball/nicpkgs";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    nicpkgs.url = "github:nicball/nicpkgs";
     fvckbot = {
       url = "github:nicball/fvckbot";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -22,7 +19,6 @@
       url = "github:Mic92/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   };
 
   outputs = { nixpkgs, home-manager, nicpkgs, ... }@inputs:
