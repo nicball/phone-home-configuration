@@ -179,7 +179,7 @@
     let
       factorio = pkgs.stdenv.mkDerivation {
         pname = "factorio-headless";
-        version = "1.1.87";
+        version = "1.1.91";
         src = pkgs.fetchurl {
           name = "factorio_headless_x64-1.1.91.tar.xz";
           url = "https://factorio.com/get-download/1.1.91/headless/linux64";
