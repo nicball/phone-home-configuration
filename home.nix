@@ -12,7 +12,7 @@
       gcc
       man-pages man-pages-posix
       kitty.terminfo
-      nicpkgs.owncast
+      owncast
     ];
   };
 
@@ -35,7 +35,7 @@
 
   systemd.user.services.clash = {
     Unit.Description = "Clash Daemon";
-    Service.ExecStart = "${pkgs.clash}/bin/clash -f ${./private/clash-tag.yaml} -d ${config.home.homeDirectory}/.local/var/clash";
+    Service.ExecStart = "${pkgs.clash}/bin/clash -f ${./private/clash.yaml} -d ${config.home.homeDirectory}/.local/var/clash";
     Install.WantedBy = [ "default.target" ];
   };
 
@@ -67,6 +67,7 @@
   systemd.user.services.cloudflared = {
     Unit.Description = "Cloudflare Argo Tunnel";
     Service.ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel --no-autoupdate run --token ${import ./private/cloudflared-token.nix}";
+    Service.Restart = "always";
     Install.WantedBy = [ "default.target" ];
   };
 
@@ -175,54 +176,54 @@
     Install.WantedBy = [ "default.target" ];
   };
 
-  systemd.user.services.factorio =
-    let
-      factorio = pkgs.stdenv.mkDerivation {
-        pname = "factorio-headless";
-        version = "1.1.91";
-        src = pkgs.fetchurl {
-          name = "factorio_headless_x64-1.1.91.tar.xz";
-          url = "https://factorio.com/get-download/1.1.91/headless/linux64";
-          sha256 = "sha256-IoiyGvsdlqoGcSoq4uMbnEXwqkounewEESXYdPB4H20=";
-        };
-        preferLocalBuild = true;
-        dontBuild = true;
-        installPhase = ''
-          mkdir -p $out/{bin,share/factorio}
-          cp -a data $out/share/factorio
-          cp -a bin/x64/factorio $out/bin/factorio
-          # patchelf \
-          #   --set-interpreter $(cat $NIX_CC/nix-support/dynamic-linker) \
-          #   $out/bin/factorio
-        '';
-      };
-      workingDir = config.home.homeDirectory + "/factorio";
-      configFile = pkgs.writeText "factorio.conf" ''
-        use-system-read-write-data-directories=true
-        [path]
-        read-data=${factorio}/share/factorio/data
-        write-data=${workingDir}
-      '';
-    in {
-      Unit = {
-        Description = "Factorio Server";
-      };
-      Service = {
-        ExecStart = toString [
-          "${pkgs.box64}/bin/box64"
-          "${factorio}/bin/factorio"
-          "--config=${configFile}"
-          "--start-server=${workingDir + "/saves/server.zip"}"
-          "--server-settings=${workingDir + "/server-settings.json"}"
-          "--mod-directory=${workingDir + "/mods"}"
-          "--server-adminlist=${workingDir + "/server-adminlist.json"}"
-          (import ./private/factorio-rcon-flags.nix)
-        ];
-        WorkingDirectory = workingDir;
-        Environment = [ "https_proxy=http://localhost:7890" ];
-      };
-      Install.WantedBy = [ "default.target" ];
-    };
+  # systemd.user.services.factorio =
+  #   let
+  #     factorio = pkgs.stdenv.mkDerivation {
+  #       pname = "factorio-headless";
+  #       version = "1.1.91";
+  #       src = pkgs.fetchurl {
+  #         name = "factorio_headless_x64-1.1.91.tar.xz";
+  #         url = "https://factorio.com/get-download/1.1.91/headless/linux64";
+  #         sha256 = "sha256-IoiyGvsdlqoGcSoq4uMbnEXwqkounewEESXYdPB4H20=";
+  #       };
+  #       preferLocalBuild = true;
+  #       dontBuild = true;
+  #       installPhase = ''
+  #         mkdir -p $out/{bin,share/factorio}
+  #         cp -a data $out/share/factorio
+  #         cp -a bin/x64/factorio $out/bin/factorio
+  #         # patchelf \
+  #         #   --set-interpreter $(cat $NIX_CC/nix-support/dynamic-linker) \
+  #         #   $out/bin/factorio
+  #       '';
+  #     };
+  #     workingDir = config.home.homeDirectory + "/factorio";
+  #     configFile = pkgs.writeText "factorio.conf" ''
+  #       use-system-read-write-data-directories=true
+  #       [path]
+  #       read-data=${factorio}/share/factorio/data
+  #       write-data=${workingDir}
+  #     '';
+  #   in {
+  #     Unit = {
+  #       Description = "Factorio Server";
+  #     };
+  #     Service = {
+  #       ExecStart = toString [
+  #         "${pkgs.box64}/bin/box64"
+  #         "${factorio}/bin/factorio"
+  #         "--config=${configFile}"
+  #         "--start-server=${workingDir + "/saves/server.zip"}"
+  #         "--server-settings=${workingDir + "/server-settings.json"}"
+  #         "--mod-directory=${workingDir + "/mods"}"
+  #         "--server-adminlist=${workingDir + "/server-adminlist.json"}"
+  #         (import ./private/factorio-rcon-flags.nix)
+  #       ];
+  #       WorkingDirectory = workingDir;
+  #       Environment = [ "https_proxy=http://localhost:7890" ];
+  #     };
+  #     Install.WantedBy = [ "default.target" ];
+  #   };
 
   # systemd.user.services.factorio-bot = {
   #   Unit = {
