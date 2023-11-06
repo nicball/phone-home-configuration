@@ -123,6 +123,7 @@
     output-dir = config.home.homeDirectory + "/www/instaepub";
     auto-archive = true;
     interval = "hourly";
+    pandoc = nicpkgs.pandoc;
   } // import ./private/instaepub.nix;
   systemd.user.services.instaepub.Service.Environment = lib.mkMerge [ "https_proxy=http://localhost:7890" ];
 
@@ -171,6 +172,16 @@
     Service = {
       ExecStart = "${pkgs.matrix-synapse}/bin/synapse_homeserver -c home_server.yaml";
       WorkingDirectory = "${config.home.homeDirectory + "/synapse"}";
+      Environment = [ "https_proxy=http://localhost:7890" ];
+    };
+    Install.WantedBy = [ "default.target" ];
+  };
+
+  systemd.user.services.rss = {
+    Unit.Description = "Telegram RSS Bot";
+    Service = {
+      ExecStart = "${nicpkgs.flowerss-bot}/bin/flowerss-bot -c ./config.yaml";
+      WorkingDirectory = "${config.home.homeDirectory + "/rss"}";
       Environment = [ "https_proxy=http://localhost:7890" ];
     };
     Install.WantedBy = [ "default.target" ];
