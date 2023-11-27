@@ -96,11 +96,11 @@
         "nur": "nur"
       },
       "locked": {
-        "lastModified": 1699255143,
-        "narHash": "sha256-yO0LbQC/1PeJ0D33GmA+fmmMTd4HjwXtFNH29c100rk=",
+        "lastModified": 1701088244,
+        "narHash": "sha256-yzhkXXeuFS0OiwnuqW9oANMN28dW5hfSdcHGxgwCcQQ=",
         "owner": "nicball",
         "repo": "nicpkgs",
-        "rev": "0d43c7a1def421139e9894c23a7302979f5a3ed0",
+        "rev": "d6b0789fdf2af9eb5ed6bf123371a45c4b7cdfd3",
         "type": "github"
       },
       "original": {
