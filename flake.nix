@@ -19,6 +19,10 @@
       url = "github:Mic92/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    factorio-bot = {
+      url = "github:nicball/midymidy-factorio-webservice";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { nixpkgs, home-manager, nicpkgs, ... }@inputs:
@@ -35,7 +39,7 @@
           nicpkgs.homeModules.${system}.cloudflare-ddns
         ];
         extraSpecialArgs = {
-          inherit (inputs) fvckbot transfersh;
+          inherit (inputs) fvckbot transfersh factorio-bot;
           inherit system;
           nicpkgs = nicpkgs.packages.${system};
           niclib = nicpkgs.niclib.${system};

@@ -1,4 +1,4 @@
-{ system, config, pkgs, lib, nicpkgs, transfersh, fvckbot, ... }:
+{ system, config, pkgs, lib, nicpkgs, transfersh, fvckbot, factorio-bot, ... }:
 
 {
   home = {
@@ -192,16 +192,6 @@
     Install.WantedBy = [ "default.target" ];
   };
 
-  systemd.user.services.rss = {
-    Unit.Description = "Telegram RSS Bot";
-    Service = {
-      ExecStart = "${nicpkgs.flowerss-bot}/bin/flowerss-bot -c ./config.yaml";
-      WorkingDirectory = "${config.home.homeDirectory + "/rss"}";
-      Environment = [ "https_proxy=http://localhost:7890" ];
-    };
-    Install.WantedBy = [ "default.target" ];
-  };
-
   systemd.user.services.factorio =
     let
       factorio = pkgs.stdenv.mkDerivation rec {
@@ -259,9 +249,29 @@
       PartOf = [ "factorio.service" ];
     };
     Service = {
-      ExecStart = "${pkgs.jre_headless}/bin/java -Dhttp.proxyHost=localhost -Dhttp.proxyPort=7890 -Dhttps.proxyHost=localhost -Dhttps.proxyPort=7890 -jar " + ./private/factorio-bot.jar;
+      ExecStart = "${factorio-bot.packages.${system}.default}/bin/midymidy-factorio-webservice";
+      Restart = "always";
+      Environment = import ./private/factorio-bot-env.nix ++ [
+        "https_proxy=http://localhost:7890"
+      ];
     };
     Install.WantedBy = [ "default.target" ];
   };
-      
+
+  systemd.user.services.crawler = {
+    Unit.Description = "Web Crawler";
+    Service = {
+      ExecStart = "${pkgs.python3.withPackages (p: [ p.requests ])}/bin/python3 bot.py";
+      WorkingDirectory = config.home.homeDirectory + "/16k-crawler";
+      Environment = [ "https_proxy=http://localhost:7890" ];
+    };
+    Install.WantedBy = [ "default.target" ];
+  };
+
+  systemd.user.timers.crawler = {
+    Unit.Description = "Timer for Web Crawler";
+    Timer.OnCalendar = "hourly";
+    Install.WantedBy = [ "timers.target" ];
+  };
+
 }

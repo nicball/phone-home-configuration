@@ -1,6 +1,45 @@
 {
   "nodes": {
+    "factorio-bot": {
+      "inputs": {
+        "flake-utils": "flake-utils",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1702117438,
+        "narHash": "sha256-QpPsNHhBu4dKiPLLnuAmjmWIr/50FtBFkhGDiSod5tI=",
+        "owner": "nicball",
+        "repo": "midymidy-factorio-webservice",
+        "rev": "cfadd22c7121e78579ac9166b9f1e0b571a7e359",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nicball",
+        "repo": "midymidy-factorio-webservice",
+        "type": "github"
+      }
+    },
     "flake-utils": {
+      "inputs": {
+        "systems": "systems"
+      },
+      "locked": {
+        "lastModified": 1701680307,
+        "narHash": "sha256-kAuep2h5ajznlPMD9rnQyffWG8EM/C73lejGofXvdM8=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "4022d587cbbfd70fe950c1e2083a02621806a725",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "flake-utils_2": {
       "locked": {
         "lastModified": 1676283394,
         "narHash": "sha256-XX2f9c3iySLCw54rJ/CZs+ZK6IQy7GXNY4nSOyu2QG4=",
@@ -15,9 +54,9 @@
         "type": "github"
       }
     },
-    "flake-utils_2": {
+    "flake-utils_3": {
       "inputs": {
-        "systems": "systems"
+        "systems": "systems_2"
       },
       "locked": {
         "lastModified": 1694529238,
@@ -33,7 +72,7 @@
         "type": "github"
       }
     },
-    "flake-utils_3": {
+    "flake-utils_4": {
       "locked": {
         "lastModified": 1631561581,
         "narHash": "sha256-3VQMV5zvxaVLvqqUrNz3iJelLw30mIVSfZmAaauM3dA=",
@@ -50,7 +89,7 @@
     },
     "fvckbot": {
       "inputs": {
-        "flake-utils": "flake-utils",
+        "flake-utils": "flake-utils_2",
         "nixpkgs": [
           "nixpkgs"
         ]
@@ -91,16 +130,16 @@
     },
     "nicpkgs": {
       "inputs": {
-        "flake-utils": "flake-utils_2",
+        "flake-utils": "flake-utils_3",
         "nixpkgs": "nixpkgs",
         "nur": "nur"
       },
       "locked": {
-        "lastModified": 1701088244,
-        "narHash": "sha256-yzhkXXeuFS0OiwnuqW9oANMN28dW5hfSdcHGxgwCcQQ=",
+        "lastModified": 1702389343,
+        "narHash": "sha256-GGkGUsJFJDi5ZQgFnN/TqDu2HcSSz6NZR6b7p3awGko=",
         "owner": "nicball",
         "repo": "nicpkgs",
-        "rev": "d6b0789fdf2af9eb5ed6bf123371a45c4b7cdfd3",
+        "rev": "63dfe1dffa73b785af555fbfd407076491537b0a",
         "type": "github"
       },
       "original": {
@@ -174,6 +213,7 @@
     },
     "root": {
       "inputs": {
+        "factorio-bot": "factorio-bot",
         "fvckbot": "fvckbot",
         "home-manager": "home-manager",
         "nicpkgs": "nicpkgs",
@@ -197,9 +237,24 @@
         "type": "github"
       }
     },
+    "systems_2": {
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
+      }
+    },
     "transfersh": {
       "inputs": {
-        "flake-utils": "flake-utils_3",
+        "flake-utils": "flake-utils_4",
         "nixpkgs": [
           "nixpkgs"
         ]
