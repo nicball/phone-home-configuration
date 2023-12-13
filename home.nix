@@ -196,11 +196,11 @@
     let
       factorio = pkgs.stdenv.mkDerivation rec {
         pname = "factorio-headless";
-        version = "1.1.94";
+        version = "1.1.100";
         src = pkgs.fetchurl {
           name = "factorio_headless_x64-${version}.tar.xz";
           url = "https://factorio.com/get-download/${version}/headless/linux64";
-          sha256 = "sha256-liicr1LRx7FeuVvlQQTGnUF1KzRcb9xrmEp82wZCWio=";
+          sha256 = "sha256-mFDdFG+T7k2ougYxZZGIiGCkBYyFSECc37XdaTq82DQ=";
         };
         preferLocalBuild = true;
         dontBuild = true;
