@@ -1,4 +1,4 @@
-{ system, config, pkgs, lib, nicpkgs, transfersh, fvckbot, factorio-bot, ... }:
+{ config, pkgs, lib, transfersh, fvckbot, factorio-bot, ... }:
 
 {
   home = {
@@ -7,7 +7,7 @@
     stateVersion = "21.11";
 
     packages = with pkgs; [
-      nix htop curl wget nicpkgs.kakoune neofetch
+      nix htop curl wget kakoune neofetch
       unar tmux aria2 file jq gnugrep pv less
       gcc
       man-pages man-pages-posix
@@ -35,7 +35,7 @@
 
   systemd.user.services.clash = {
     Unit.Description = "Clash Daemon";
-    Service.ExecStart = "${pkgs.clash}/bin/clash -f ${./private/clash.yaml} -d ${config.home.homeDirectory}/.local/var/clash";
+    Service.ExecStart = "${pkgs.clash-meta}/bin/clash-meta -f ${./private/clash.yaml} -d ${config.home.homeDirectory}/.local/var/clash";
     Install.WantedBy = [ "default.target" ];
   };
 
@@ -86,7 +86,7 @@
   # systemd.user.services.fvckbot = {
   #   Unit.Description = "Yet another telegram bot";
   #   Service = {
-  #     ExecStart = "${fvckbot.defaultPackage.${system}}/bin/fvckbot";
+  #     ExecStart = "${fvckbot.defaultPackage.${pkgs.system}}/bin/fvckbot";
   #     WorkingDirectory = "${config.home.homeDirectory + "/fvckbot"}";
   #     Environment = [
   #       "TG_BOT_TOKEN=${import ./private/fvckbot-token.nix}"
@@ -96,34 +96,34 @@
   #   Install.WantedBy = [ "default.target" ];
   # };
 
-  systemd.user.services.transfersh = {
-    Unit.Description = "Easy and fast file sharing from the command-line";
-    Service = {
-      ExecStart =
-        let pkg = with pkgs; buildGoModule {
-          src = transfersh;
-          pname = "transfer.sh";
-          version = "1.4.0";
-          vendorSha256 = "sha256-d7EMXCtDGp9k6acVg/FiLqoO1AsRzoCMkBb0zen9IGc=";
-        }; in
-        "${pkg}/bin/transfer.sh";
-      Environment = [
-        "LISTENER=:8081"
-        "TEMP_PATH=/tmp/"
-        "PROVIDER=local"
-        "BASEDIR=${config.home.homeDirectory + "/transfersh"}"
-        "LOG=${config.home.homeDirectory + "/transfersh/.log"}"
-      ];
-    };
-    Install.WantedBy = [ "default.target" ];
-  };
+  # systemd.user.services.transfersh = {
+  #   Unit.Description = "Easy and fast file sharing from the command-line";
+  #   Service = {
+  #     ExecStart =
+  #       let pkg = with pkgs; buildGoModule {
+  #         src = transfersh;
+  #         pname = "transfer.sh";
+  #         version = "1.4.0";
+  #         vendorHash = "sha256-d7EMXCtDGp9k6acVg/FiLqoO1AsRzoCMkBb0zen9IGc=";
+  #       }; in
+  #       "${pkg}/bin/transfer.sh";
+  #     Environment = [
+  #       "LISTENER=:8081"
+  #       "TEMP_PATH=/tmp/"
+  #       "PROVIDER=local"
+  #       "BASEDIR=${config.home.homeDirectory + "/transfersh"}"
+  #       "LOG=${config.home.homeDirectory + "/transfersh/.log"}"
+  #     ];
+  #   };
+  #   Install.WantedBy = [ "default.target" ];
+  # };
 
   services.instaepub = {
     enable = true;
     output-dir = config.home.homeDirectory + "/www/instaepub";
     auto-archive = true;
     interval = "hourly";
-    pandoc = nicpkgs.pandoc;
+    pandoc = pkgs.pandoc-static;
   } // import ./private/instaepub.nix;
   systemd.user.services.instaepub.Service.Environment = lib.mkMerge [ "https_proxy=http://localhost:7890" ];
 
@@ -138,7 +138,7 @@
     Service = {
       ExecStart =
         let
-          aria2 = nicpkgs.aria2.override ({
+          aria2 = pkgs.aria2.override ({
             server-mode = true;
             dir = config.home.homeDirectory + "/www/files";
           } // import ./private/aria2d.nix);
@@ -174,7 +174,7 @@
       Requires = [ "synapse.service" ];
     };
     Service = {
-      ExecStart = "${nicpkgs.matrix-qq}/bin/matrix-qq";
+      ExecStart = "${pkgs.matrix-qq}/bin/matrix-qq";
       WorkingDirectory = "${config.home.homeDirectory + "/matrix-qq"}";
     };
     Install.WantedBy = [ "default.target" ];
@@ -192,71 +192,71 @@
     Install.WantedBy = [ "default.target" ];
   };
 
-  systemd.user.services.factorio =
-    let
-      factorio = pkgs.stdenv.mkDerivation rec {
-        pname = "factorio-headless";
-        version = "1.1.100";
-        src = pkgs.fetchurl {
-          name = "factorio_headless_x64-${version}.tar.xz";
-          url = "https://factorio.com/get-download/${version}/headless/linux64";
-          sha256 = "sha256-mFDdFG+T7k2ougYxZZGIiGCkBYyFSECc37XdaTq82DQ=";
-        };
-        preferLocalBuild = true;
-        dontBuild = true;
-        installPhase = ''
-          mkdir -p $out/{bin,share/factorio}
-          cp -a data $out/share/factorio
-          cp -a bin/x64/factorio $out/bin/factorio
-          # patchelf \
-          #   --set-interpreter $(cat $NIX_CC/nix-support/dynamic-linker) \
-          #   $out/bin/factorio
-        '';
-      };
-      workingDir = config.home.homeDirectory + "/factorio";
-      configFile = pkgs.writeText "factorio.conf" ''
-        use-system-read-write-data-directories=true
-        [path]
-        read-data=${factorio}/share/factorio/data
-        write-data=${workingDir}
-      '';
-    in {
-      Unit = {
-        Description = "Factorio Server";
-      };
-      Service = {
-        ExecStart = toString [
-          "${pkgs.box64}/bin/box64"
-          "${factorio}/bin/factorio"
-          "--config=${configFile}"
-          "--start-server=${workingDir + "/saves/server.zip"}"
-          "--server-settings=${workingDir + "/server-settings.json"}"
-          "--mod-directory=${workingDir + "/mods"}"
-          "--server-adminlist=${workingDir + "/server-adminlist.json"}"
-          (import ./private/factorio-rcon-flags.nix)
-        ];
-        WorkingDirectory = workingDir;
-        Environment = [ "https_proxy=http://localhost:7890" ];
-      };
-      Install.WantedBy = [ "default.target" ];
-    };
+  # systemd.user.services.factorio =
+  #   let
+  #     factorio = pkgs.stdenv.mkDerivation rec {
+  #       pname = "factorio-headless";
+  #       version = "1.1.100";
+  #       src = pkgs.fetchurl {
+  #         name = "factorio_headless_x64-${version}.tar.xz";
+  #         url = "https://factorio.com/get-download/${version}/headless/linux64";
+  #         sha256 = "sha256-mFDdFG+T7k2ougYxZZGIiGCkBYyFSECc37XdaTq82DQ=";
+  #       };
+  #       preferLocalBuild = true;
+  #       dontBuild = true;
+  #       installPhase = ''
+  #         mkdir -p $out/{bin,share/factorio}
+  #         cp -a data $out/share/factorio
+  #         cp -a bin/x64/factorio $out/bin/factorio
+  #         # patchelf \
+  #         #   --set-interpreter $(cat $NIX_CC/nix-support/dynamic-linker) \
+  #         #   $out/bin/factorio
+  #       '';
+  #     };
+  #     workingDir = config.home.homeDirectory + "/factorio";
+  #     configFile = pkgs.writeText "factorio.conf" ''
+  #       use-system-read-write-data-directories=true
+  #       [path]
+  #       read-data=${factorio}/share/factorio/data
+  #       write-data=${workingDir}
+  #     '';
+  #   in {
+  #     Unit = {
+  #       Description = "Factorio Server";
+  #     };
+  #     Service = {
+  #       ExecStart = toString [
+  #         "${pkgs.box64}/bin/box64"
+  #         "${factorio}/bin/factorio"
+  #         "--config=${configFile}"
+  #         "--start-server=${workingDir + "/saves/server.zip"}"
+  #         "--server-settings=${workingDir + "/server-settings.json"}"
+  #         "--mod-directory=${workingDir + "/mods"}"
+  #         "--server-adminlist=${workingDir + "/server-adminlist.json"}"
+  #         (import ./private/factorio-rcon-flags.nix)
+  #       ];
+  #       WorkingDirectory = workingDir;
+  #       Environment = [ "https_proxy=http://localhost:7890" ];
+  #     };
+  #     Install.WantedBy = [ "default.target" ];
+  #   };
 
-  systemd.user.services.factorio-bot = {
-    Unit = {
-      Description = "Factorio Telegram Bridge";
-      After = [ "factorio.service" ];
-      Requires = [ "factorio.service" ];
-      PartOf = [ "factorio.service" ];
-    };
-    Service = {
-      ExecStart = "${factorio-bot.packages.${system}.default}/bin/midymidy-factorio-webservice";
-      Restart = "always";
-      Environment = import ./private/factorio-bot-env.nix ++ [
-        "https_proxy=http://localhost:7890"
-      ];
-    };
-    Install.WantedBy = [ "default.target" ];
-  };
+  # systemd.user.services.factorio-bot = {
+  #   Unit = {
+  #     Description = "Factorio Telegram Bridge";
+  #     After = [ "factorio.service" ];
+  #     Requires = [ "factorio.service" ];
+  #     PartOf = [ "factorio.service" ];
+  #   };
+  #   Service = {
+  #     ExecStart = "${factorio-bot.packages.${pkgs.system}.default}/bin/midymidy-factorio-webservice";
+  #     Restart = "always";
+  #     Environment = import ./private/factorio-bot-env.nix ++ [
+  #       "https_proxy=http://localhost:7890"
+  #     ];
+  #   };
+  #   Install.WantedBy = [ "default.target" ];
+  # };
 
   systemd.user.services.crawler = {
     Unit.Description = "Web Crawler";
