@@ -130,15 +130,14 @@
     "nicpkgs": {
       "inputs": {
         "flake-utils": "flake-utils_3",
-        "nixpkgs": "nixpkgs",
-        "nur": "nur"
+        "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1704707742,
-        "narHash": "sha256-vHvHEErEZj5UckIJAATftuD+PRK65jxAbfjgwmw2QCM=",
+        "lastModified": 1704975745,
+        "narHash": "sha256-7etexpzpbyyM0unffXGPWLqz4fLQRtKPt0IYj+o5QVo=",
         "owner": "nicball",
         "repo": "nicpkgs",
-        "rev": "e70d60618ae7710e0ad40b05e56e11fe4326949c",
+        "rev": "e0a8d09ac32a575b25b10b28e08e173d20e1571d",
         "type": "github"
       },
       "original": {
@@ -192,20 +191,6 @@
       },
       "original": {
         "id": "nixpkgs",
-        "type": "indirect"
-      }
-    },
-    "nur": {
-      "locked": {
-        "lastModified": 1704703461,
-        "narHash": "sha256-wrALL/W2fmV+ct+LWb+ThFCwap+48jyTXNBA2Qozqpw=",
-        "owner": "nix-community",
-        "repo": "NUR",
-        "rev": "6559903e1813f675e5f72ca092d6f3afa727e1fc",
-        "type": "github"
-      },
-      "original": {
-        "id": "nur",
         "type": "indirect"
       }
     },

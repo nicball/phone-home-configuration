@@ -192,71 +192,52 @@
     Install.WantedBy = [ "default.target" ];
   };
 
-  # systemd.user.services.factorio =
-  #   let
-  #     factorio = pkgs.stdenv.mkDerivation rec {
-  #       pname = "factorio-headless";
-  #       version = "1.1.100";
-  #       src = pkgs.fetchurl {
-  #         name = "factorio_headless_x64-${version}.tar.xz";
-  #         url = "https://factorio.com/get-download/${version}/headless/linux64";
-  #         sha256 = "sha256-mFDdFG+T7k2ougYxZZGIiGCkBYyFSECc37XdaTq82DQ=";
-  #       };
-  #       preferLocalBuild = true;
-  #       dontBuild = true;
-  #       installPhase = ''
-  #         mkdir -p $out/{bin,share/factorio}
-  #         cp -a data $out/share/factorio
-  #         cp -a bin/x64/factorio $out/bin/factorio
-  #         # patchelf \
-  #         #   --set-interpreter $(cat $NIX_CC/nix-support/dynamic-linker) \
-  #         #   $out/bin/factorio
-  #       '';
-  #     };
-  #     workingDir = config.home.homeDirectory + "/factorio";
-  #     configFile = pkgs.writeText "factorio.conf" ''
-  #       use-system-read-write-data-directories=true
-  #       [path]
-  #       read-data=${factorio}/share/factorio/data
-  #       write-data=${workingDir}
-  #     '';
-  #   in {
-  #     Unit = {
-  #       Description = "Factorio Server";
-  #     };
-  #     Service = {
-  #       ExecStart = toString [
-  #         "${pkgs.box64}/bin/box64"
-  #         "${factorio}/bin/factorio"
-  #         "--config=${configFile}"
-  #         "--start-server=${workingDir + "/saves/server.zip"}"
-  #         "--server-settings=${workingDir + "/server-settings.json"}"
-  #         "--mod-directory=${workingDir + "/mods"}"
-  #         "--server-adminlist=${workingDir + "/server-adminlist.json"}"
-  #         (import ./private/factorio-rcon-flags.nix)
-  #       ];
-  #       WorkingDirectory = workingDir;
-  #       Environment = [ "https_proxy=http://localhost:7890" ];
-  #     };
-  #     Install.WantedBy = [ "default.target" ];
-  #   };
+  systemd.user.services.factorio =
+    let
+      workingDir = config.home.homeDirectory + "/factorio";
+      configFile = pkgs.writeText "factorio.conf" ''
+        use-system-read-write-data-directories=true
+        [path]
+        read-data=${pkgs.factorio-headless}/share/factorio/data
+        write-data=${workingDir}
+      '';
+    in {
+      Unit = {
+        Description = "Factorio Server";
+      };
+      Service = {
+        ExecStart = toString [
+          "${pkgs.box64}/bin/box64"
+          "${pkgs.factorio-headless}/bin/factorio"
+          "--config=${configFile}"
+          "--start-server=${workingDir + "/saves/server.zip"}"
+          "--server-settings=${workingDir + "/server-settings.json"}"
+          "--mod-directory=${workingDir + "/mods"}"
+          "--server-adminlist=${workingDir + "/server-adminlist.json"}"
+          (import ./private/factorio-rcon-flags.nix)
+        ];
+        WorkingDirectory = workingDir;
+        Environment = [ "https_proxy=http://localhost:7890" ];
+      };
+      Install.WantedBy = [ "default.target" ];
+    };
 
-  # systemd.user.services.factorio-bot = {
-  #   Unit = {
-  #     Description = "Factorio Telegram Bridge";
-  #     After = [ "factorio.service" ];
-  #     Requires = [ "factorio.service" ];
-  #     PartOf = [ "factorio.service" ];
-  #   };
-  #   Service = {
-  #     ExecStart = "${factorio-bot.packages.${pkgs.system}.default}/bin/midymidy-factorio-webservice";
-  #     Restart = "always";
-  #     Environment = import ./private/factorio-bot-env.nix ++ [
-  #       "https_proxy=http://localhost:7890"
-  #     ];
-  #   };
-  #   Install.WantedBy = [ "default.target" ];
-  # };
+  systemd.user.services.factorio-bot = {
+    Unit = {
+      Description = "Factorio Telegram Bridge";
+      After = [ "factorio.service" ];
+      Requires = [ "factorio.service" ];
+      PartOf = [ "factorio.service" ];
+    };
+    Service = {
+      ExecStart = "${factorio-bot.packages.${pkgs.system}.default}/bin/midymidy-factorio-webservice";
+      Restart = "always";
+      Environment = import ./private/factorio-bot-env.nix ++ [
+        "https_proxy=http://localhost:7890"
+      ];
+    };
+    Install.WantedBy = [ "default.target" ];
+  };
 
   systemd.user.services.crawler = {
     Unit.Description = "Web Crawler";
