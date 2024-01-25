@@ -1,4 +1,4 @@
-{ config, pkgs, lib, transfersh, fvckbot, factorio-bot, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   home = {
@@ -21,7 +21,15 @@
   nix = {
     settings = {
       experimental-features = [ "nix-command" "flakes" ];
-      substituters = [ "https://mirrors.ustc.edu.cn/nix-channels/store" "https://cache.nixos.org/" ];
+      substituters = [
+        "https://mirrors.ustc.edu.cn/nix-channels/store"
+        "https://cache.nixos.org/"
+        "https://nicpkgs.cachix.org"
+      ];
+      trusted-public-keys = [
+        "nicpkgs.cachix.org-1:OTCMJ8lLYwhnDhlkP0huok3hOnxV3u/YVDH9M0kPLqM="
+        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      ];
       auto-optimise-store = true;
     };
     package = pkgs.nix;
@@ -86,7 +94,7 @@
   # systemd.user.services.fvckbot = {
   #   Unit.Description = "Yet another telegram bot";
   #   Service = {
-  #     ExecStart = "${fvckbot.defaultPackage.${pkgs.system}}/bin/fvckbot";
+  #     ExecStart = "${pkgs.fvckbot}/bin/fvckbot";
   #     WorkingDirectory = "${config.home.homeDirectory + "/fvckbot"}";
   #     Environment = [
   #       "TG_BOT_TOKEN=${import ./private/fvckbot-token.nix}"
@@ -99,14 +107,7 @@
   # systemd.user.services.transfersh = {
   #   Unit.Description = "Easy and fast file sharing from the command-line";
   #   Service = {
-  #     ExecStart =
-  #       let pkg = with pkgs; buildGoModule {
-  #         src = transfersh;
-  #         pname = "transfer.sh";
-  #         version = "1.4.0";
-  #         vendorHash = "sha256-d7EMXCtDGp9k6acVg/FiLqoO1AsRzoCMkBb0zen9IGc=";
-  #       }; in
-  #       "${pkg}/bin/transfer.sh";
+  #     ExecStart = "${pkg.tranfersh}/bin/transfer.sh";
   #     Environment = [
   #       "LISTENER=:8081"
   #       "TEMP_PATH=/tmp/"
@@ -230,7 +231,7 @@
       PartOf = [ "factorio.service" ];
     };
     Service = {
-      ExecStart = "${factorio-bot.packages.${pkgs.system}.default}/bin/midymidy-factorio-webservice";
+      ExecStart = "${pkgs.factorio-bot}/bin/midymidy-factorio-webservice";
       Restart = "always";
       Environment = import ./private/factorio-bot-env.nix ++ [
         "https_proxy=http://localhost:7890"

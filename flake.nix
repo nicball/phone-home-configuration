@@ -7,20 +7,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nicpkgs.url = "github:nicball/nicpkgs";
-    fvckbot = {
-      url = "github:nicball/fvckbot";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    transfersh = {
-      url = "github:dutchcoders/transfer.sh/v1.4.0";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     nix-index-database = {
       url = "github:Mic92/nix-index-database";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    factorio-bot = {
-      url = "github:nicball/midymidy-factorio-webservice";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -37,11 +25,8 @@
           nix-index-database.hmModules.nix-index
           instaepub
           cloudflare-ddns
-          # ({ ... }: { nixpkgs.overlays = [ nicpkgs.overlays.default ]; })
+          ({ ... }: { home.sessionVariables.NIX_PATH = "nixpkgs=${nixpkgs}:home-manager=${home-manager}:nicpkgs=${nicpkgs}"; })
         ];
-        extraSpecialArgs = {
-          inherit (inputs) fvckbot transfersh factorio-bot;
-        };
       };
     };
 }
