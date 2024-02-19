@@ -248,11 +248,13 @@
     Service.ExecStart = pkgs.writeShellScript "factorio-saves.sh" ''
       dir="${config.home.homeDirectory}/factorio"
       mkdir -p "$dir/old-saves"
-      files=($(ls -t $dir/saves/*.zip))
-      cp "''${files[0]}" $dir/old-saves/$(mktemp -u XXXXX.zip)
-      oldfiles=($(ls -t $dir/old-saves))
-      if [[ ''${#oldfiles[@]} -gt 100 ]]; then
-        rm "$dir/old-saves/''${oldfiles[-1]}"
+      cd "$dir/saves"
+      files=($(ls -t))
+      cp "$dir/saves/''${files[0]}" "$dir/old-saves/$(mktemp -u XXXXX-"''${files[0]}")"
+      cd "$dir/old-saves"
+      oldfiles=($(ls -t))
+      if [[ "''${#oldfiles[@]}" -gt 100 ]]; then
+        rm "''${oldfiles[-1]}"
       fi
     '';
   };
