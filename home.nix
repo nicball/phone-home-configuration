@@ -240,6 +240,29 @@
     Install.WantedBy = [ "default.target" ];
   };
 
+  systemd.user.services.factorio-saves = {
+    Unit = {
+      Description = "Auto-archive factorio saves";
+      Requisite = [ "factorio.service" ];
+    };
+    Service.ExecStart = pkgs.writeShellScript "factorio-saves.sh" ''
+      dir="${config.home.homeDirectory}/factorio"
+      mkdir -p "$dir/old-saves"
+      files=($(ls -t $dir/saves/*.zip))
+      cp "''${files[0]}" $dir/old-saves/$(mktemp -u XXXXX.zip)
+      oldfiles=($(ls -t $dir/old-saves))
+      if [[ ''${#oldfiles[@]} -gt 100 ]]; then
+        rm "$dir/old-saves/''${oldfiles[-1]}"
+      fi
+    '';
+  };
+
+  systemd.user.timers.factorio-saves = {
+    Unit.Description = "Timer for factorio save archiver";
+    Timer.OnCalendar = "00,06,12,18:00";
+    Install.WantedBy = [ "timers.target" ];
+  };
+
   systemd.user.services.crawler = {
     Unit.Description = "Web Crawler";
     Service = {
