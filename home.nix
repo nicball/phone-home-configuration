@@ -249,11 +249,19 @@
       dir="${config.home.homeDirectory}/factorio"
       mkdir -p "$dir/old-saves"
       cd "$dir/saves"
-      files=($(ls -t))
-      cp "$dir/saves/''${files[0]}" "$dir/old-saves/$(mktemp -u XXXXX-"''${files[0]}")"
+      files=($(ls -At))
+      [[ ''${#files[@]} -eq 0 ]] && exit
+      newest="''${files[0]}"
       cd "$dir/old-saves"
-      oldfiles=($(ls -t))
-      if [[ "''${#oldfiles[@]}" -gt 100 ]]; then
+      oldfiles=($(ls -At))
+      if [[ ''${#oldfiles[@]} -gt 0 ]]; then
+        last="''${oldfiles[0]}"
+        newesttime=$(date -r "$dir/saves/$newest" +%s)
+        lasttime=$(date -r "$dir/old-saves/$last" +%s)
+        [[ $((newesttime - lasttime)) -lt $((55 * 360)) ]] && exit
+      fi
+      cp "$dir/saves/$newest" "$dir/old-saves/$(mktemp -u "XXXXX-$newest")"
+      if [[ "''${#oldfiles[@]}" -ge 100 ]]; then
         rm "''${oldfiles[-1]}"
       fi
     '';
