@@ -25,7 +25,9 @@
           nix-index-database.hmModules.nix-index
           instaepub
           cloudflare-ddns
-          ({ ... }: { home.sessionVariables.NIX_PATH = "nixpkgs=${nixpkgs}:home-manager=${home-manager}:nicpkgs=${nicpkgs}"; })
+          ({ ... }: {
+            home.sessionVariables.NIX_PATH = "nixpkgs=flake:nixpkgs:home-manager=${home-manager}:nicpkgs=${nicpkgs}";
+          })
         ];
       };
     };
