@@ -16,18 +16,14 @@
   outputs = { nixpkgs, home-manager, nicpkgs, nix-index-database, ... }@inputs:
     let
       system = "aarch64-linux";
-      pkgs = import nixpkgs { inherit system; overlays = [ nicpkgs.overlays.default ]; };
+      # pkgs = import nixpkgs { inherit system; overlays = [ nicpkgs.overlays.default ]; };
     in {
       homeConfigurations.phablet = home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
-        modules = with nicpkgs.homeModules; [
+        pkgs = import nixpkgs { inherit system; };
+        modules = [
           ./home.nix
           nix-index-database.hmModules.nix-index
-          instaepub
-          cloudflare-ddns
-          ({ ... }: {
-            home.sessionVariables.NIX_PATH = "nixpkgs=flake:nixpkgs:home-manager=${home-manager}:nicpkgs=${nicpkgs}";
-          })
+          nicpkgs.homeModules.default
         ];
       };
     };

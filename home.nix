@@ -5,15 +5,16 @@
     # ./factorio.nix
   ];
 
+  nic.nicpkgs.enable-overlay = true;
+
   home = {
     username = "phablet";
     homeDirectory = "/home/phablet";
     stateVersion = "21.11";
 
     packages = with pkgs; [
-      nix htop curl wget kakoune neofetch
+      nix htop curl wget
       unar tmux aria2 file jq gnugrep pv less
-      gcc
       man-pages man-pages-posix
       kitty.terminfo
       owncast
@@ -21,6 +22,8 @@
   };
 
   programs.home-manager.enable = true;
+
+  nic.kakoune.enable = true;
 
   nix = {
     settings = {
@@ -123,7 +126,7 @@
   #   Install.WantedBy = [ "default.target" ];
   # };
 
-  services.instaepub = {
+  nic.instaepub = {
     enable = true;
     output-dir = config.home.homeDirectory + "/www/instaepub";
     auto-archive = true;
@@ -132,7 +135,7 @@
   } // import ./private/instaepub.nix;
   systemd.user.services.instaepub.Service.Environment = lib.mkMerge [ "https_proxy=http://localhost:7890" ];
 
-  services.cloudflare-ddns = {
+  nic.cloudflare-ddns = {
     enable = true;
     enable-log = true;
     log-path = "/tmp/cloudflare-ddns.log";
@@ -153,6 +156,7 @@
     Install.WantedBy = [ "default.target" ];
   };
 
+  nixpkgs.config.permittedInsecurePackages = [ "olm-3.2.16" ];
   systemd.user.services.mautrix-telegram = {
     Unit = {
       Description = "Mautrix Telegram Bridge";
@@ -222,6 +226,32 @@
     Unit.Description = "Timer for Web Crawler";
     Timer.OnCalendar = "hourly";
     Install.WantedBy = [ "timers.target" ];
+  };
+
+  systemd.user.services.nodebb = let dir = config.home.homeDirectory + "/nodebb"; in {
+    Unit = {
+      Description = "NodeBB forum";
+      Requires = [ "redis.service" ];
+      After = [ "redis.service" ];
+    };
+    Service = {
+      Environment = "PATH=${pkgs.nodejs}/bin";
+      ExecStart = "${dir}/nodebb start";
+      ExecStop = "${dir}/nodebb stop";
+      Type = "oneshot";
+      RemainAfterExit = true;
+      WorkingDirectory = dir;
+    };
+    Install.WantedBy = [ "default.target" ];
+  };
+
+  systemd.user.services.redis = {
+    Unit.Description = "redis";
+    Service = {
+      ExecStart = "${pkgs.redis}/bin/redis-server ./redis.conf";
+      WorkingDirectory = config.home.homeDirectory + "/redis";
+    };
+    Install.WantedBy = [ "default.target" ];
   };
 
 }
